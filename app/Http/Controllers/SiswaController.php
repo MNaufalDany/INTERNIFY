@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Siswa;
+
+class SiswaController extends Controller
+{
+    public function index()
+    {
+        $siswa = Siswa::orderBy('nama')->paginate(5);
+        return view('siswa.index', compact('siswa'));
+    }
+
+
+    public function create()
+    {
+        $siswa = Siswa::orderBy('nama')->paginate(5);
+        return view('siswa.create', compact('siswa'));
+    }
+
+
+    public function store(Request $request)
+    {
+        //validate form
+        $this->validate($request, [
+            'nama'     => 'required|min:5',
+            'kelas'   => 'required|min:3'
+        ]);
+
+        //create post
+        Siswa::create([
+            'nama'     => $request->nama,
+            'kelas'   => $request->kelas
+        ]);
+
+        //redirect to siswa
+        return redirect('siswa.index')->with(['success' => 'Data Berhasil Disimpan!']);
+    }
+
+    public function edit($id)
+    {
+        $siswa = Siswa::findOrFail($id);
+        return view('siswa.edit', compact('siswa'));
+    }
+
+    public function update(Request $request, Siswa $siswa)
+    {
+        $this->validate($request, [
+            'nama' => 'required|min:5',
+            'kelas' => 'required|min:5',
+        ]);
+
+
+        $siswa->update([
+            'nama' => $request->nama,
+            'kelas' => $request->kelas,
+        ]);
+
+        return redirect('siswa')->with(['success' => 'Data Berhasil Diupdate!']);
+    }
+
+
+
+    public function destroy(Siswa $siswa)
+    {
+        //$siswa = Siswa::find($request->id);
+        // return $guru;
+        $siswa->delete();
+
+        //redirect to index
+        return redirect()->route('siswa.index')->with(['success' => 'Data Berhasil Dihapus!']);
+    }
+}
+
